@@ -8,4 +8,11 @@ module.exports = {
     twitterApiSecret: 'YOUR_TWITTER_API_SECRET',
     twitterAccessToken: 'YOUR_TWITTER_ACCESS_TOKEN',
     twitterAccessTokenSecret: 'YOUR_TWITTER_ACCESS_TOKEN_SECRET',
+    facebook: {
+      appId: '3712304215648076',
+      appSecret: '1766671b6253a4b658aee272b99b209b',
+      accessToken: '3712304215648076|CDLLd51S-UpLutSfH4Qh8DMLMCo',
+    }
   };
+
+  

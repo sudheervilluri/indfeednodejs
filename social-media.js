@@ -1,6 +1,6 @@
 const Twitter = require('twitter-api-v2');
 const TelegramBot = require('node-telegram-bot-api');
-const Facebook = require('facebook-sdk');
+const Facebook = require('facebook-node-sdk');
 const config = require('./config');
 
 
@@ -16,10 +16,19 @@ async function postToTelegram(content) {
   console.log(`Message posted to Telegram`);
 }
 
-async function postToFacebook(content, config) {
-  const facebook = new Facebook(config.facebook);
-  const post = await facebook.api('/me/feed', 'post', { message: content });
-  console.log(`Post posted to Facebook: ${post.id}`);
-}
+async function postToFacebook(content) {
+    try {
+      const facebook = new Facebook(config.facebook);
+      facebook.api('/me/feed', 'post', { message: content }, (err, post) => {
+        if (err) {
+          console.error(`Error posting to Facebook: ${err.message}`);
+        } else {
+          console.log(`Post posted to Facebook: ${post.id}`);
+        }
+      });
+    } catch (error) {
+      console.error(`Error posting to Facebook: ${error.message}`);
+    }
+  }
 
-module.exports = {  postToTelegram };
+module.exports = {  postToTelegram, postToFacebook };
