@@ -44,7 +44,7 @@ setInterval(() => {
                         openAiApi.generateContent(item)
                             .then(rewrittenText => {
                                 // Post the rewritten text on Facebook
-                               //   socialMedia.postToTelegram(rewrittenText);
+                                  socialMedia.postToTelegram(rewrittenText);
                               //  socialMedia.postToFacebook(rewrittenText);
                                 // Add the item to the existing data
                                 existingData.push(item);
