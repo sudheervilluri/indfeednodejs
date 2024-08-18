@@ -6,6 +6,16 @@ const openAiApi = require('./openai-api');
 const socialMedia = require('./social-media');
 const fs = require('fs');
 const cron = require('node-cron');
+const axios = require('axios');
+
+const url = 'https://apixt-iw.indmoney.com/wright/api/web/v1/markets/today?only_news=true';
+const params = {
+    only_news: true
+};
+
+const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+};
 
 
 // Load the existing data from the file
@@ -28,33 +38,49 @@ setInterval(() => {
             .then(feed => {
                 // Filter out items with an isoDate older than today
                 const today = new Date().getDate();
-                
-                const filteredItems = feed.items.filter(item => {
+
+                let filteredItems = feed.items.filter(item => {
                     const isoDate = new Date(item.isoDate).getDate();
                     return isoDate >= today;
                 });
 
-                // Process the filtered items
-                filteredItems.forEach(item => {
-                    // Check if the item is new
-                    const isNew = !existingData.find(existingItem => existingItem.link === item.link);
-                    if (isNew) {
-                        // Send the item to OpenAI for rewriting
-                        console.log(item);
-                        openAiApi.generateContent(item)
-                            .then(rewrittenText => {
-                                // Post the rewritten text on Facebook
-                                  socialMedia.postToTelegram(rewrittenText);
-                              //  socialMedia.postToFacebook(rewrittenText);
-                                // Add the item to the existing data
-                                existingData.push(item);
-                                fs.writeFileSync('data.json', JSON.stringify(existingData));
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    }
-                });
+                axios.get(url, { params, headers })
+                    .then(response => {
+                        const newData = response.data.data.live_news.list;
+                        filteredItems = [...filteredItems, ...newData]; // add new data to existing list
+
+
+                        // Process the filtered items
+                        filteredItems.forEach(item => {
+                            // Check if the item is new
+                            const isNew = !existingData.find(existingItem => existingItem.link === item.link);
+                            if (isNew) {
+                                var text = ""
+                                if (item.title) {
+                                    text = `${item.title} and ${item.content}`;
+                                } else {
+                                    text = `${item.heading} and ${item.stock_name}`
+                                }
+                                // Send the item to OpenAI for rewriting
+                                console.log(item);
+                                openAiApi.generateContent(text)
+                                    .then(rewrittenText => {
+                                        // Post the rewritten text on Facebook
+                                           socialMedia.postToTelegram(rewrittenText);
+                                        //  socialMedia.postToFacebook(rewrittenText);
+                                        // Add the item to the existing data
+                                        existingData.push(item);
+                                        fs.writeFileSync('data.json', JSON.stringify(existingData));
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                    });
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
             })
             .catch(error => {
                 console.error(error);
