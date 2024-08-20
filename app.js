@@ -7,7 +7,7 @@ const socialMedia = require('./social-media');
 const fs = require('fs');
 const cron = require('node-cron');
 const axios = require('axios');
-
+//https://apixt-iw.indmoney.com/wright/api/web/v1/markets/news?section=stocks_to_watch 
 const url = 'https://apixt-iw.indmoney.com/wright/api/web/v1/markets/today?only_news=true';
 const params = {
     only_news: true
@@ -66,7 +66,7 @@ setInterval(() => {
                                 openAiApi.generateContent(text)
                                     .then(rewrittenText => {
                                         // Post the rewritten text on Facebook
-                                           socialMedia.postToTelegram(rewrittenText);
+                                        //   socialMedia.postToTelegram(rewrittenText);
                                         //  socialMedia.postToFacebook(rewrittenText);
                                         // Add the item to the existing data
                                         existingData.push(item);
