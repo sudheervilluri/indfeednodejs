@@ -91,5 +91,6 @@ setInterval(() => {
 // Run every midnight to reset the data.json file
 cron.schedule('0 0 * * *', () => {
     console.log('Resetting data.json file...');
+    existingData = []
     fs.writeFileSync('data.json', JSON.stringify([]));
 });
