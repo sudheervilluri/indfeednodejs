@@ -30,6 +30,7 @@ try {
 // Set the RSS feed URL and interval
 const rssUrl = config.rssUrl;
 const interval = config.interval;
+const rssinterval= config.rssinterval;
 
 // Read the RSS feed at the specified interval
 setInterval(() => {
