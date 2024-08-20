@@ -33,6 +33,56 @@ const interval = config.interval;
 
 // Read the RSS feed at the specified interval
 setInterval(() => {
+    axios.get(url, { params, headers })
+        .then(response => {
+            const newData = response.data.data.live_news.list;
+        
+            // Process the filtered items
+            newData.forEach(item => {
+                // Check if the item is new
+                const isNew = !existingData.find(existingItem => existingItem.link === item.link);
+                if (isNew) {
+                    var text = ""
+                    if (item.title) {
+                        text = `${item.title} and ${item.content}`;
+                    } else {
+                        text = `${item.heading} and ${item.stock_name}`
+                    }
+                    // Send the item to OpenAI for rewriting
+                    console.log(item);
+                    openAiApi.generateContent(text)
+                        .then(rewrittenText => {
+                            // Post the rewritten text on Facebook
+                            socialMedia.postToTelegram(rewrittenText)
+                            //  socialMedia.postToFacebook(rewrittenText);
+                            // Add the item to the existing data
+                            existingData.push(item);
+                            fs.writeFileSync('data.json', JSON.stringify(existingData));
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                }
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}, interval);
+
+
+
+// Load the existing data from the file
+let rssdata = [];
+try {
+    rssdata = fs.readFileSync('data2.json', 'utf8');
+    rssdata = JSON.parse(rssdata) || [];
+} catch (error) {
+    console.error(error);
+}
+
+// Read the RSS feed at the specified interval
+setInterval(() => {
     rssUrl.forEach(it => {
         rssParser.parseRssFeed(it)
             .then(feed => {
@@ -44,53 +94,45 @@ setInterval(() => {
                     return isoDate >= today;
                 });
 
-                axios.get(url, { params, headers })
-                    .then(response => {
-                        const newData = response.data.data.live_news.list;
-                        filteredItems = [...filteredItems, ...newData]; // add new data to existing list
-
-
-                        // Process the filtered items
-                        filteredItems.forEach(item => {
-                            // Check if the item is new
-                            const isNew = !existingData.find(existingItem => existingItem.link === item.link);
-                            if (isNew) {
-                                var text = ""
-                                if (item.title) {
-                                    text = `${item.title} and ${item.content}`;
-                                } else {
-                                    text = `${item.heading} and ${item.stock_name}`
-                                }
-                                // Send the item to OpenAI for rewriting
-                                console.log(item);
-                                openAiApi.generateContent(text)
-                                    .then(rewrittenText => {
-                                        // Post the rewritten text on Facebook
-                                           socialMedia.postToTelegram(rewrittenText);
-                                        //  socialMedia.postToFacebook(rewrittenText);
-                                        // Add the item to the existing data
-                                        existingData.push(item);
-                                        fs.writeFileSync('data.json', JSON.stringify(existingData));
-                                    })
-                                    .catch(error => {
-                                        console.error(error);
-                                    });
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                // Process the filtered items
+                filteredItems.forEach(item => {
+                    // Check if the item is new
+                    const isNew = !rssdata.find(existingItem => existingItem.link === item.link);
+                    if (isNew) {
+                        var text = ""
+                        if (item.title) {
+                            text = `${item.title} and ${item.content}`;
+                        } else {
+                            text = `${item.heading} and ${item.stock_name}`
+                        }
+                        // Send the item to OpenAI for rewriting
+                        console.log(item);
+                        openAiApi.generateContent(text)
+                            .then(rewrittenText => {
+                                // Post the rewritten text on Facebook
+                                socialMedia.postToTelegram(rewrittenText)
+                                //  socialMedia.postToFacebook(rewrittenText);
+                                // Add the item to the existing data
+                                rssdata.push(item);
+                                fs.writeFileSync('data2.json', JSON.stringify(rssdata));
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }
+                });
             })
             .catch(error => {
                 console.error(error);
             });
     });
-}, interval);
+}, rssinterval);
 
 // Run every midnight to reset the data.json file
 cron.schedule('0 0 * * *', () => {
     console.log('Resetting data.json file...');
     existingData = []
+    rssdata = []
+    fs.writeFileSync('data2.json', JSON.stringify([]));
     fs.writeFileSync('data.json', JSON.stringify([]));
 });

@@ -13,6 +13,7 @@ async function postToTwitter(content, config) {
 async function postToTelegram(content) {
   const bot = new TelegramBot(config.telegramBotToken, { polling: false });
   bot.sendMessage(config.telegramChatId, content);
+  await new Promise(resolve => setTimeout(resolve, 1000)); // 20-second sleep
   console.log(`Message posted to Telegram`);
 }
 
