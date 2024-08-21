@@ -18,13 +18,20 @@ async function postToTelegram(content) {
   processQueue();
 }
  
+
 async function processQueue() {
   if (queue.length === 0) return;
 
-  const content = queue.shift();
-  const bot = new TelegramBot(config.telegramBotToken, { polling: false });
-  bot.sendMessage(config.telegramChatId, content);
-  console.log(`Message posted to Telegram`);
+  const content = queue[0];
+  try {
+    const bot = new TelegramBot(config.telegramBotToken, { polling: false });
+    await bot.sendMessage(config.telegramChatId, content);
+    console.log(`Message posted to Telegram`);
+    queue.shift(); // Remove the message from the queue if successful
+  } catch (error) {
+    console.error(`Error sending message to Telegram: ${error}`);
+    // Do not remove the message from the queue if there's an error
+  }
 
   await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
 
