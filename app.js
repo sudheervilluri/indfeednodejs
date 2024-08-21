@@ -72,9 +72,6 @@ setInterval(() => {
 }, interval);
 
 
-
-// Load the existing data from the file
-let rssdata = [];
 try {
     rssdata = fs.readFileSync('data2.json', 'utf8');
     rssdata = JSON.parse(rssdata) || [];
