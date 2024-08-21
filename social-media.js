@@ -10,11 +10,25 @@ async function postToTwitter(content, config) {
   console.log(`Tweet posted: ${tweet.id}`);
 }
 
+const queue = [];
+
 async function postToTelegram(content) {
+  console.log("message send to pool"+content)
+  queue.push(content);
+  processQueue();
+}
+ 
+async function processQueue() {
+  if (queue.length === 0) return;
+
+  const content = queue.shift();
   const bot = new TelegramBot(config.telegramBotToken, { polling: false });
   bot.sendMessage(config.telegramChatId, content);
-  await new Promise(resolve => setTimeout(resolve, 1000)); // 20-second sleep
   console.log(`Message posted to Telegram`);
+
+  await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
+
+  processQueue();
 }
 
 async function postToFacebook(content) {
