@@ -19,16 +19,14 @@ async function postToTelegram(content) {
 }
  
 async function processQueue() {
-  if (queue.length === 0) return;
+  while (queue.length > 0) {
+    const content = queue.shift();
+    const bot = new TelegramBot(config.telegramBotToken, { polling: false });
+    bot.sendMessage(config.telegramChatId, content);
+    console.log(`Message posted to Telegram`);
 
-  const content = queue.shift();
-  const bot = new TelegramBot(config.telegramBotToken, { polling: false });
-  bot.sendMessage(config.telegramChatId, content);
-  console.log(`Message posted to Telegram`);
-
-  await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
-
-  processQueue();
+    await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
+  }
 }
 
 async function postToFacebook(content) {

@@ -37,40 +37,48 @@ try {
 const rssUrl = config.rssUrl;
 const interval = config.interval;
 const rssinterval = config.rssinterval;
-
-setInterval(() => {
+function fetchAndProcessData() {
     axios.get(url, { params, headers })
-        .then(response => {
-            const newData = response.data.data.live_news.list;
-
-            newData.forEach(async item => {
-                const isNew = !existingData.find(existingItem => existingItem.link === item.link);
-                if (isNew) {
-                    let text = '';
-                    if (item.title) {
-                        text = `${item.title} and ${item.content}`;
-                    } else {
-                        text = `${item.heading} and ${item.stock_name}`;
-                    }
-
-                    await openAiApi.generateContent(text)
-                        .then(rewrittenText => {
-                            socialMedia.postToTelegram(rewrittenText);
-                            // socialMedia.postToFacebook(rewrittenText);
-                            existingData.push(item);
-                            fs.writeFileSync('data.json', JSON.stringify(existingData));
-                        })
-                        .catch(error => {
-                            console.error('Error generating content:', error);
-                        });
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-}, interval);
-
+      .then(response => {
+        const newData = response.data.data.live_news.list;
+        console.log(newData);
+        response.data.data.live_news.list.forEach(item => {
+            console.log('Inside forEach loop');
+            const existingItem = existingData.find(existingItem => existingItem.heading && existingItem.heading === item.heading);
+            if (!existingItem) {
+              console.log('Inside if block');
+              let text = '';
+              if (item.title) {
+                text = `${item.title} and ${item.content}`;
+              } else {
+                text = `${item.heading} and ${item.stock_name}`;
+              }
+              console.log('Calling openAiApi.generateContent');
+              openAiApi.generateContent(text)
+                .then(rewrittenText => {
+                  console.log('Inside then block');
+                  socialMedia.postToTelegram(rewrittenText);
+                  // socialMedia.postToFacebook(rewrittenText);
+                  existingData.push(item);
+                  fs.writeFileSync('data.json', JSON.stringify(existingData));
+                })
+                .catch(error => {
+                  console.error('Error generating content:', error);
+                });
+            }
+          });
+  
+        // Schedule the next execution
+        setTimeout(fetchAndProcessData, interval);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        // You might want to retry or handle the error differently
+      });
+  }
+  
+  // Initial execution
+  fetchAndProcessData();
 
 try {
     rssdata = fs.readFileSync('data2.json', 'utf8');
@@ -78,6 +86,7 @@ try {
 } catch (error) {
     console.error(error);
 }
+
 
 // Read the RSS feed at the specified interval
 setInterval(() => {
