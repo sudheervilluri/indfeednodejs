@@ -4,11 +4,12 @@ module.exports = {
     rssinterval: 15 * 60 * 1000, // 15 minutes
     openAiApiKey: 'AIzaSyCALev-FejSw2TOdMxcXV4LEUJTF4ikOGU',
     telegramBotToken: '7361308483:AAGZNIjnE9aKW2qabJEjTKcCjneraKENO4c',
+    twitter: "AAAAAAAAAAAAAAAAAAAAAN65rwEAAAAA%2BYw8b2FKxAggPtHVbDER7ScXiMw%3DTLnRazxW4T5QYkD2MWS3mTGZkkjoyUSwDAy0cBXXXIyiiPLf1p",
     telegramChatId: '-1001782371292',
-    twitterApiKey: 'YOUR_TWITTER_API_KEY',
-    twitterApiSecret: 'YOUR_TWITTER_API_SECRET',
-    twitterAccessToken: 'YOUR_TWITTER_ACCESS_TOKEN',
-    twitterAccessTokenSecret: 'YOUR_TWITTER_ACCESS_TOKEN_SECRET',
+    twitterApiKey: 'zAwzmCzS2uGOUqTLeZ98N3AkI',
+    twitterApiSecret: 'NkKMTj4TZwrGBvT0SepwG2qRbR3ORPWMO14Z8Na9irsSW3rmfm',
+    twitterAccessToken: 'NnY3TUZ0R25MLTNaRXJSQXFodjk6MTpjaQ',
+    twitterAccessTokenSecret: 'ceeABzIB4So0-_H_MmTlPQZFJS3Jb_EIXsdEF_YExA17YRmwjL',
     facebook: {
       appId: '3712304215648076',
       appSecret: '1766671b6253a4b658aee272b99b209b',
