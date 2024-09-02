@@ -32,7 +32,7 @@ try {
 } catch (error) {
     console.error('Error reading data2.json:', error);
     rssdata = [];
-}
+} 
 
 const rssUrl = config.rssUrl;
 const interval = config.interval;
