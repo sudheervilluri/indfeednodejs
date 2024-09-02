@@ -133,7 +133,7 @@ setInterval(() => {
                 console.error(error);
             });
     });
-}, rssinterval);
+}, config.rssinterval);
 
 // Run every midnight to reset the data.json file
 
