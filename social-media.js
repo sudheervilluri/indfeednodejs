@@ -25,7 +25,7 @@ async function processQueue() {
     bot.sendMessage(config.telegramChatId, content);
     console.log(`Message posted to Telegram`);
 
-    await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
+   // await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
   }
 }
 

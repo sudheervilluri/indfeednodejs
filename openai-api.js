@@ -10,7 +10,7 @@ async function generateContent(item) {
     const prompt = `rewrite trending tweet short and crisp in less than 300 charecters with trending tags from ${item}.`;
     const result = await model.generateContent(prompt);
     console.log(result.response.text());
-    await new Promise(resolve => setTimeout(resolve, 1000)); // 20-second sleep
+   // await new Promise(resolve => setTimeout(resolve, 1000)); // 20-second sleep
     return result.response.text();
   }
 

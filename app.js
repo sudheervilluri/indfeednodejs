@@ -42,7 +42,8 @@ function fetchAndProcessData() {
       .then(response => {
         const newData = response.data.data.live_news.list;
         console.log(newData);
-        response.data.data.live_news.list.forEach(item => {
+        response.data.data.live_news.list.forEach(async item => {
+            await new Promise(resolve => setTimeout(resolve, 5000));
             console.log('Inside forEach loop');
             const existingItem = existingData.find(existingItem => existingItem.heading && existingItem.heading === item.heading);
             if (!existingItem) {
@@ -137,10 +138,10 @@ setInterval(() => {
 
 // Run every midnight to reset the data.json file
 
-cron.schedule('0 0 * * *', () => {
-    console.log('Resetting data.json file...');
-    existingData = [];
-    rssdata = [];
-    fs.writeFileSync('data2.json', JSON.stringify([]));
-    fs.writeFileSync('data.json', JSON.stringify([]));
-});
+//cron.schedule('0 0 * * *', () => {
+ //   console.log('Resetting data.json file...');
+ //   existingData = [];
+ //   rssdata = [];
+ //   fs.writeFileSync('data2.json', JSON.stringify([]));
+ //   fs.writeFileSync('data.json', JSON.stringify([]));
+//});
