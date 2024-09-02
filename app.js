@@ -74,7 +74,7 @@ function fetchAndProcessData() {
           });
   
         // Schedule the next execution
-        setTimeout(fetchAndProcessData, interval);
+        setTimeout(fetchAndProcessData, config.interval);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
