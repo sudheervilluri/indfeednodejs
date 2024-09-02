@@ -18,6 +18,8 @@ const headers = {
 let existingData = [];
 let rssdata = [];
 
+// ...
+
 try {
     existingData = fs.readFileSync('data.json', 'utf8');
     existingData = JSON.parse(existingData) || [];
@@ -34,9 +36,8 @@ try {
     rssdata = [];
 } 
 
-const rssUrl = config.rssUrl;
-const interval = config.interval;
-const rssinterval = config.rssinterval;
+// ...
+
 function fetchAndProcessData() {
     axios.get(url, { params, headers })
       .then(response => {
@@ -60,6 +61,9 @@ function fetchAndProcessData() {
                   console.log('Inside then block');
                   socialMedia.postToTelegram(rewrittenText);
                   // socialMedia.postToFacebook(rewrittenText);
+                  if (existingData.length >= 100) {
+                    existingData.splice(0, 1);
+                  }
                   existingData.push(item);
                   fs.writeFileSync('data.json', JSON.stringify(existingData));
                 })
@@ -80,14 +84,6 @@ function fetchAndProcessData() {
   
   // Initial execution
   fetchAndProcessData();
-
-try {
-    rssdata = fs.readFileSync('data2.json', 'utf8');
-    rssdata = JSON.parse(rssdata) || [];
-} catch (error) {
-    console.error(error);
-}
-
 
 // Read the RSS feed at the specified interval
 setInterval(() => {
@@ -121,6 +117,9 @@ setInterval(() => {
                                 socialMedia.postToTelegram(rewrittenText)
                                 //  socialMedia.postToFacebook(rewrittenText);
                                 // Add the item to the existing data
+                                if (rssdata.length >= 100) {
+                                    rssdata.splice(0, 1);
+                                }
                                 rssdata.push(item);
                                 fs.writeFileSync('data2.json', JSON.stringify(rssdata));
                             })
