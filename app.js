@@ -44,7 +44,7 @@ function fetchAndProcessData() {
         const newData = response.data.data.live_news.list;
         console.log(newData);
         response.data.data.live_news.list.forEach(async item => {
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, 15000));
             console.log('Inside forEach loop');
             const existingItem = existingData.find(existingItem => existingItem.heading && existingItem.heading === item.heading);
             if (!existingItem) {
@@ -87,7 +87,7 @@ function fetchAndProcessData() {
 
 // Read the RSS feed at the specified interval
 setInterval(() => {
-    rssUrl.forEach(it => {
+    config.rssUrl.forEach(it => {
         rssParser.parseRssFeed(it)
             .then(feed => {
                 // Filter out items with an isoDate older than today
