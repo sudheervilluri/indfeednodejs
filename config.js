@@ -1,5 +1,5 @@
 module.exports = {
-    rssUrl: ['https://www.cnbctv18.com/commonfeeds/v1/cne/rss/market.xml','https://www.thehindubusinessline.com/companies/feeder/default.rss'],
+    rssUrl: ['https://www.livemint.com/rss/companies'],
     interval: 10 * 60 * 1000, // 15 minutes
     rssinterval: 15 * 60 * 1000, // 15 minutes
     openAiApiKey: 'AIzaSyCALev-FejSw2TOdMxcXV4LEUJTF4ikOGU',
