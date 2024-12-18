@@ -44,7 +44,7 @@ function fetchAndProcessData() {
         const newData = response.data.data.live_news.list;
         console.log(newData);
         response.data.data.live_news.list.forEach(async item => {
-            await new Promise(resolve => setTimeout(resolve, 15000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             console.log('Inside forEach loop');
             const existingItem = existingData.find(existingItem => existingItem.heading && existingItem.heading === item.heading);
             if (!existingItem) {
