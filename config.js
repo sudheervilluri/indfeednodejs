@@ -1,7 +1,7 @@
 module.exports = {
     rssUrl: ['https://www.livemint.com/rss/companies'],
-    interval: 1 * 60 * 1000, // 15 minutes
-    rssinterval: 1 * 60 * 1000, // 15 minutes
+    interval: 3 * 60 * 1000, // 15 minutes
+    rssinterval: 3 * 60 * 1000, // 15 minutes
     openAiApiKey: 'AIzaSyCALev-FejSw2TOdMxcXV4LEUJTF4ikOGU',
     telegramBotToken: '7361308483:AAGZNIjnE9aKW2qabJEjTKcCjneraKENO4c',
     twitter: "AAAAAAAAAAAAAAAAAAAAAN65rwEAAAAA%2BYw8b2FKxAggPtHVbDER7ScXiMw%3DTLnRazxW4T5QYkD2MWS3mTGZkkjoyUSwDAy0cBXXXIyiiPLf1p",
