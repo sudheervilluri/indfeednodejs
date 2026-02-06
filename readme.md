@@ -34,8 +34,6 @@ You can replace these with a database later (MongoDB, Postgres, etc.) if needed.
 - `POST /api/holdings`
 - `DELETE /api/holdings/:symbol`
 - `GET /api/news`
-- `GET /api/companies`
-- `GET /api/prices?symbols=RELIANCE.NS,TCS.NS`
 - `GET /api/summary`
 
 ## Free hosting (Render)
