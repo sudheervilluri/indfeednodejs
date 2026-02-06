@@ -35,3 +35,17 @@ You can replace these with a database later (MongoDB, Postgres, etc.) if needed.
 - `DELETE /api/holdings/:symbol`
 - `GET /api/news`
 - `GET /api/summary`
+
+## Free hosting (Render)
+This app runs as-is on Render’s free web service tier.
+
+1. Create a new Web Service on https://render.com and connect this GitHub repo.
+2. Render will read `render.yaml` and auto-configure the build/start commands.
+3. Click **Deploy**. When it finishes, your app will be live at the Render URL.
+
+If you prefer a manual setup in Render, use:
+- **Build command:** `npm install`
+- **Start command:** `node app.js`
+
+> Tip: If you want your own custom domain, Render supports it on paid plans.
+=======
