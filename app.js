@@ -1,146 +1,207 @@
-const config = require('./config');
-const rssParser = require('./rss-parser');
-const openAiApi = require('./openai-api');
-const socialMedia = require('./social-media');
 const fs = require('fs');
-const cron = require('node-cron');
-const axios = require('axios');
+const http = require('http');
+const path = require('path');
+const { URL } = require('url');
 
-const url = 'https://apixt-iw.indmoney.com/wright/api/web/v1/markets/today?only_news=true';
-const params = {
-    only_news: true
-};
+const PORT = process.env.PORT || 3000;
+const DATA_DIR = path.join(__dirname, 'data');
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const HOLDINGS_PATH = path.join(DATA_DIR, 'holdings.json');
+const NEWS_PATH = path.join(DATA_DIR, 'news.json');
 
-const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-};
-
-let existingData = [];
-let rssdata = [];
-
-// ...
-
-try {
-    existingData = fs.readFileSync('data.json', 'utf8');
-    existingData = JSON.parse(existingData) || [];
-} catch (error) {
-    console.error('Error reading data.json:', error);
-    existingData = [];
-}
-
-try {
-    rssdata = fs.readFileSync('data2.json', 'utf8');
-    rssdata = JSON.parse(rssdata) || [];
-} catch (error) {
-    console.error('Error reading data2.json:', error);
-    rssdata = [];
-} 
-
-// ...
-
-function fetchAndProcessData() {
-    axios.get(url, { params, headers })
-      .then(response => {
-        const newData = response.data.data.live_news.list;
-        console.log(newData);
-        response.data.data.live_news.list.forEach(async item => {
-            await new Promise(resolve => setTimeout(resolve, config.interval));
-            console.log('Inside forEach loop');
-            const existingItem = existingData.find(existingItem => existingItem.heading && existingItem.heading === item.heading);
-            if (!existingItem) {
-              console.log('Inside if block');
-              let text = '';
-              if (item.title) {
-                text = `${item.title} and ${item.content}`;
-              } else {
-                text = `${item.heading} and ${item.stock_name}`;
-              }
-              console.log('Calling openAiApi.generateContent');
-              openAiApi.generateContent(text)
-                .then(rewrittenText => {
-                  console.log('Inside then block');
-                  socialMedia.postToTelegram(rewrittenText);
-                  // socialMedia.postToFacebook(rewrittenText);
-                  if (existingData.length >= 100) {
-                    existingData.splice(0, 1);
-                  }
-                  existingData.push(item);
-                  fs.writeFileSync('data.json', JSON.stringify(existingData));
-                })
-                .catch(error => {
-                  console.error('Error generating content:', error);
-                });
-            }
-          });
-  
-        // Schedule the next execution
-        setTimeout(fetchAndProcessData, config.interval);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        // You might want to retry or handle the error differently
-      });
+const createDataDir = () => {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR);
   }
-  
-  // Initial execution
-  fetchAndProcessData();
+};
 
-// Read the RSS feed at the specified interval
-setInterval(() => {
-    config.rssUrl.forEach(it => {
-        rssParser.parseRssFeed(it)
-            .then(feed => {
-                // Filter out items with an isoDate older than today
-                const today = new Date().getDate();
+const readJson = (filePath, fallback) => {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(raw);
+  } catch (error) {
+    return fallback;
+  }
+};
 
-                let filteredItems = feed.items.filter(item => {
-                    const isoDate = new Date(item.isoDate).getDate();
-                    return isoDate >= today;
-                });
+const writeJson = (filePath, data) => {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
 
-                // Process the filtered items
-                filteredItems.forEach(item => {
-                    // Check if the item is new
-                    const isNew = !rssdata.find(existingItem => existingItem.link === item.link);
-                    if (isNew) {
-                        var text = ""
-                        if (item.title) {
-                            text = `${item.title} and ${item.content}`;
-                        } else {
-                            text = `${item.heading} and ${item.stock_name}`
-                        }
-                        // Send the item to OpenAI for rewriting
-                        console.log(item);
-                        openAiApi.generateContent(text)
-                            .then(rewrittenText => {
-                                // Post the rewritten text on Facebook
-                                socialMedia.postToTelegram(rewrittenText)
-                                //  socialMedia.postToFacebook(rewrittenText);
-                                // Add the item to the existing data
-                                if (rssdata.length >= 100) {
-                                    rssdata.splice(0, 1);
-                                }
-                                rssdata.push(item);
-                                fs.writeFileSync('data2.json', JSON.stringify(rssdata));
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    }
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
+const seedData = () => {
+  if (!fs.existsSync(HOLDINGS_PATH)) {
+    writeJson(HOLDINGS_PATH, [
+      {
+        symbol: 'AAPL',
+        shares: 12,
+        avgPrice: 182.45,
+        addedAt: '2024-08-12T09:15:00Z'
+      },
+      {
+        symbol: 'MSFT',
+        shares: 8,
+        avgPrice: 392.1,
+        addedAt: '2024-08-11T11:20:00Z'
+      }
+    ]);
+  }
+
+  if (!fs.existsSync(NEWS_PATH)) {
+    writeJson(NEWS_PATH, [
+      {
+        id: 'news-1',
+        source: 'MarketWatch',
+        title: 'AI demand pushes cloud earnings outlook higher',
+        symbol: 'MSFT',
+        publishedAt: '2024-08-12T10:00:00Z'
+      },
+      {
+        id: 'news-2',
+        source: 'Bloomberg',
+        title: 'Apple unveils next-gen chips for on-device AI',
+        symbol: 'AAPL',
+        publishedAt: '2024-08-10T14:30:00Z'
+      },
+      {
+        id: 'news-3',
+        source: 'Reuters',
+        title: 'Markets steady as investors parse inflation data',
+        symbol: 'SPY',
+        publishedAt: '2024-08-09T15:45:00Z'
+      }
+    ]);
+  }
+};
+
+const sendJson = (res, statusCode, payload) => {
+  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(payload));
+};
+
+const parseJsonBody = req =>
+  new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
     });
-}, config.rssinterval);
+    req.on('end', () => {
+      if (!body) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(body));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
 
-// Run every midnight to reset the data.json file
+const getContentType = filePath => {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.html':
+      return 'text/html';
+    case '.css':
+      return 'text/css';
+    case '.js':
+      return 'application/javascript';
+    case '.json':
+      return 'application/json';
+    case '.png':
+      return 'image/png';
+    case '.svg':
+      return 'image/svg+xml';
+    default:
+      return 'text/plain';
+  }
+};
 
-//cron.schedule('0 0 * * *', () => {
- //   console.log('Resetting data.json file...');
- //   existingData = [];
- //   rssdata = [];
- //   fs.writeFileSync('data2.json', JSON.stringify([]));
- //   fs.writeFileSync('data.json', JSON.stringify([]));
-//});
+const serveStatic = (req, res, pathname) => {
+  const safePath = path.normalize(pathname).replace(/^(\.\.(\/|\\|$))+/, '');
+  const filePath = path.join(PUBLIC_DIR, safePath === '/' ? 'index.html' : safePath);
+
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    res.writeHead(200, { 'Content-Type': getContentType(filePath) });
+    fs.createReadStream(filePath).pipe(res);
+    return;
+  }
+
+  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  fs.createReadStream(indexPath).pipe(res);
+};
+
+createDataDir();
+seedData();
+
+const server = http.createServer(async (req, res) => {
+  const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+  const { pathname } = requestUrl;
+
+  if (pathname === '/api/holdings' && req.method === 'GET') {
+    return sendJson(res, 200, readJson(HOLDINGS_PATH, []));
+  }
+
+  if (pathname === '/api/holdings' && req.method === 'POST') {
+    try {
+      const { symbol, shares, avgPrice } = await parseJsonBody(req);
+      if (!symbol || Number.isNaN(Number(shares)) || Number.isNaN(Number(avgPrice))) {
+        return sendJson(res, 400, { message: 'symbol, shares, and avgPrice are required.' });
+      }
+
+      const holdings = readJson(HOLDINGS_PATH, []);
+      const normalizedSymbol = symbol.toUpperCase();
+      const payload = {
+        symbol: normalizedSymbol,
+        shares: Number(shares),
+        avgPrice: Number(avgPrice),
+        addedAt: new Date().toISOString()
+      };
+      const existingIndex = holdings.findIndex(item => item.symbol === normalizedSymbol);
+      if (existingIndex >= 0) {
+        holdings[existingIndex] = payload;
+      } else {
+        holdings.push(payload);
+      }
+
+      writeJson(HOLDINGS_PATH, holdings);
+      return sendJson(res, 201, payload);
+    } catch (error) {
+      return sendJson(res, 400, { message: 'Invalid JSON payload.' });
+    }
+  }
+
+  if (pathname.startsWith('/api/holdings/') && req.method === 'DELETE') {
+    const symbol = pathname.split('/').pop().toUpperCase();
+    const holdings = readJson(HOLDINGS_PATH, []);
+    const filtered = holdings.filter(item => item.symbol !== symbol);
+    writeJson(HOLDINGS_PATH, filtered);
+    return sendJson(res, 200, { message: 'Removed', symbol });
+  }
+
+  if (pathname === '/api/news' && req.method === 'GET') {
+    return sendJson(res, 200, readJson(NEWS_PATH, []));
+  }
+
+  if (pathname === '/api/summary' && req.method === 'GET') {
+    const holdings = readJson(HOLDINGS_PATH, []);
+    const totalCost = holdings.reduce((sum, holding) => sum + holding.shares * holding.avgPrice, 0);
+    return sendJson(res, 200, {
+      totalHoldings: holdings.length,
+      totalCost: Number(totalCost.toFixed(2))
+    });
+  }
+
+  return serveStatic(req, res, pathname);
+});
+
+server.listen(PORT, () => {
+  console.log(`Portfolio tracker running on http://localhost:${PORT}`);
+});

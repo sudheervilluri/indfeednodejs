@@ -1,24 +1,50 @@
-Go to app's dashboard on https://developers.facebook.com/apps
+# PF Stock Portfolio Tracker (Node + React)
 
-Get the app id (APP_ID) and the app secret (APP_SECRET)
+This project is a lightweight portfolio tracker that combines a Node.js API with a React
+dashboard (served from a static HTML file) to help you log holdings and view market news.
 
-Use the app id and the app secret to get an access token by using this url:
+## Features
+- **Holdings tracking** (add/update/delete positions).
+- **Portfolio summary** with total invested cost basis.
+- **Market news feed** for the tickers you follow.
 
-https://graph.facebook.com/oauth/access_token?client_id=APP_ID &client_secret=APP_SECRET&grant_type=client_credentials
+## Local development
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the server:
+   ```bash
+   npm start
+   ```
+3. Open the app:
+   ```
+   http://localhost:3000
+   ```
 
-This returns something like
+## Data storage
+The API uses JSON files for storage so it works without a database:
+- `data/holdings.json`
+- `data/news.json`
 
-{"access_token":"123412342134|f34f34f32fc3rc4rc324r-X","token_type":"bearer"}
+You can replace these with a database later (MongoDB, Postgres, etc.) if needed.
 
-I then use this access token to access the events
+## API endpoints
+- `GET /api/holdings`
+- `POST /api/holdings`
+- `DELETE /api/holdings/:symbol`
+- `GET /api/news`
+- `GET /api/summary`
 
-https://graph.facebook.com/v2.12/{11239244970}/events/?fields={id,name}&access_token={123412342134|f34f34f32fc3rc4rc324r-X}
+## Free hosting (Render)
+This app runs as-is on Render’s free web service tier.
 
-However, this returns the error mentioned above, "Invalid OAuth access token signature.".
+1. Create a new Web Service on https://render.com and connect this GitHub repo.
+2. Render will read `render.yaml` and auto-configure the build/start commands.
+3. Click **Deploy**. When it finishes, your app will be live at the Render URL.
 
+If you prefer a manual setup in Render, use:
+- **Build command:** `npm install`
+- **Start command:** `node app.js`
 
-To get the Client Access Token for an app, do the following:
-
-Sign into your developer account. On the Apps page, select an app to open the dashboard for that app. On the Dashboard, navigate to Settings > Advanced > Security > Client token.
-
-https://developers.facebook.com/docs/facebook-login/guides/access-tokens#errors
+> Tip: If you want your own custom domain, Render supports it on paid plans.
