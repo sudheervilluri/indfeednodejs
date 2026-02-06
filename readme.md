@@ -48,3 +48,4 @@ If you prefer a manual setup in Render, use:
 - **Start command:** `node app.js`
 
 > Tip: If you want your own custom domain, Render supports it on paid plans.
+=======
