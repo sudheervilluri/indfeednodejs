@@ -34,16 +34,7 @@ You can replace these with a database later (MongoDB, Postgres, etc.) if needed.
 - `POST /api/holdings`
 - `DELETE /api/holdings/:symbol`
 - `GET /api/news`
-- `GET /api/companies`
-- `GET /api/prices?symbols=RELIANCE.NS,TCS.NS`
 - `GET /api/summary`
-
-## Price data (free APIs)
-By default the app uses **Yahoo Finance** because it requires no API key.
-
-If you want a dedicated API, add a free **Twelve Data** key:
-- Set `TWELVE_DATA_API_KEY` in your environment or Render service.
-- The server will automatically prefer Twelve Data and fall back to Yahoo Finance if the key is missing.
 
 ## Free hosting (Render)
 This app runs as-is on Render’s free web service tier.

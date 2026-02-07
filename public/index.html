@@ -21,77 +21,34 @@
       const { useEffect, useMemo, useState } = React;
 
       const formatCurrency = value =>
-        value.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+        value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
       const App = () => {
         const [holdings, setHoldings] = useState([]);
         const [news, setNews] = useState([]);
         const [summary, setSummary] = useState({ totalHoldings: 0, totalCost: 0 });
-        const [companies, setCompanies] = useState([]);
-        const [prices, setPrices] = useState({});
-        const [priceProvider, setPriceProvider] = useState('');
         const [formState, setFormState] = useState({ symbol: '', shares: '', avgPrice: '' });
         const [status, setStatus] = useState('');
-        const [profileName, setProfileName] = useState(
-          () => localStorage.getItem('pfProfileName') || 'Your Name'
-        );
 
         const loadData = async () => {
-          const [holdingsRes, newsRes, summaryRes, companiesRes] = await Promise.all([
+          const [holdingsRes, newsRes, summaryRes] = await Promise.all([
             fetch('/api/holdings'),
             fetch('/api/news'),
-            fetch('/api/summary'),
-            fetch('/api/companies')
+            fetch('/api/summary')
           ]);
           setHoldings(await holdingsRes.json());
           setNews(await newsRes.json());
           setSummary(await summaryRes.json());
-          setCompanies(await companiesRes.json());
         };
 
         useEffect(() => {
           loadData();
         }, []);
 
-        useEffect(() => {
-          if (!holdings.length) {
-            return;
-          }
-          const symbols = holdings.map(item => item.symbol).join(',');
-          fetch(`/api/prices?symbols=${encodeURIComponent(symbols)}`)
-            .then(response => response.json())
-            .then(data => {
-              const priceMap = data.reduce((acc, item) => {
-                acc[item.symbol] = item;
-                return acc;
-              }, {});
-              setPrices(priceMap);
-              setPriceProvider(data[0]?.provider || '');
-            })
-            .catch(() => {
-              setPrices({});
-              setPriceProvider('');
-            });
-        }, [holdings]);
-
-        useEffect(() => {
-          localStorage.setItem('pfProfileName', profileName);
-        }, [profileName]);
-
         const totalInvested = useMemo(
           () => holdings.reduce((sum, item) => sum + item.shares * item.avgPrice, 0),
           [holdings]
         );
-
-        const totalMarketValue = useMemo(() => {
-          return holdings.reduce((sum, item) => {
-            const livePrice = prices[item.symbol]?.price;
-            if (!livePrice) {
-              return sum;
-            }
-            return sum + livePrice * item.shares;
-          }, 0);
-        }, [holdings, prices]);
 
         const handleSubmit = async event => {
           event.preventDefault();
@@ -132,20 +89,12 @@
           <div className="page">
             <header className="hero">
               <div>
-                <p className="pill">PF Tracker India</p>
-                <h1>{profileName}'s portfolio tracker</h1>
+                <p className="pill">PF Tracker</p>
+                <h1>Portfolio overview with news you actually track</h1>
                 <p className="subtitle">
-                  Track Indian listed companies, update holdings in seconds, and watch live prices
-                  alongside market headlines.
+                  Store your holdings, keep a pulse on investments, and follow market headlines in one
+                  simple dashboard.
                 </p>
-                <label className="profile-field">
-                  Profile name
-                  <input
-                    value={profileName}
-                    onChange={event => setProfileName(event.target.value)}
-                    placeholder="Your Name"
-                  />
-                </label>
               </div>
               <div className="hero-card">
                 <h2>Summary</h2>
@@ -158,16 +107,8 @@
                   <strong>{formatCurrency(summary.totalCost || totalInvested)}</strong>
                 </div>
                 <div className="metric">
-                  <span>Live market value</span>
-                  <strong>{totalMarketValue ? formatCurrency(totalMarketValue) : '—'}</strong>
-                </div>
-                <div className="metric">
                   <span>Latest refresh</span>
                   <strong>{new Date().toLocaleDateString()}</strong>
-                </div>
-                <div className="metric helper">
-                  <span>Price source</span>
-                  <strong>{priceProvider || '—'}</strong>
                 </div>
               </div>
             </header>
@@ -184,7 +125,6 @@
                     <span>Shares</span>
                     <span>Avg. Price</span>
                     <span>Cost Basis</span>
-                    <span>Current Price</span>
                     <span></span>
                   </div>
                   {holdings.map(item => (
@@ -193,11 +133,6 @@
                       <span>{item.shares}</span>
                       <span>{formatCurrency(item.avgPrice)}</span>
                       <span>{formatCurrency(item.shares * item.avgPrice)}</span>
-                      <span>
-                        {prices[item.symbol]?.price
-                          ? formatCurrency(prices[item.symbol].price)
-                          : '—'}
-                      </span>
                       <button onClick={() => removeHolding(item.symbol)}>Remove</button>
                     </div>
                   ))}
@@ -208,23 +143,14 @@
                 <h2>Add or Update a Holding</h2>
                 <form onSubmit={handleSubmit}>
                   <label>
-                    Listed company
+                    Ticker symbol
                     <input
                       value={formState.symbol}
                       onChange={event =>
                         setFormState({ ...formState, symbol: event.target.value.toUpperCase() })
                       }
-                      list="company-options"
-                      placeholder="RELIANCE.NS"
+                      placeholder="AAPL"
                     />
-                    <datalist id="company-options">
-                      {companies.map(company => (
-                        <option
-                          key={company.symbol}
-                          value={company.symbol}
-                        >{`${company.name} (${company.symbol})`}</option>
-                      ))}
-                    </datalist>
                   </label>
                   <label>
                     Shares
