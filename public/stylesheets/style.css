@@ -5,7 +5,9 @@
 body {
   margin: 0;
   font-family: "Inter", system-ui, sans-serif;
-  background: #0f1116;
+  background: radial-gradient(circle at top, rgba(255, 122, 48, 0.2), transparent 45%),
+    radial-gradient(circle at bottom, rgba(45, 179, 92, 0.2), transparent 40%),
+    #0f1116;
   color: #f4f4f6;
 }
 
@@ -36,8 +38,8 @@ body {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(110, 182, 255, 0.18);
-  color: #6eb6ff;
+  background: rgba(255, 153, 51, 0.2);
+  color: #ff9933;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -49,6 +51,7 @@ body {
   padding: 20px 24px;
   min-width: 240px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 153, 51, 0.18);
 }
 
 .hero-card h2 {
@@ -66,6 +69,16 @@ body {
   color: #ffffff;
 }
 
+.metric.helper {
+  font-size: 12px;
+  color: #9aa3b7;
+}
+
+.profile-field {
+  margin-top: 20px;
+  max-width: 280px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -77,6 +90,7 @@ body {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(36, 41, 56, 0.8);
 }
 
 .panel-header {
@@ -94,7 +108,7 @@ body {
 
 .table-row {
   display: grid;
-  grid-template-columns: 80px 80px 110px 1fr 80px;
+  grid-template-columns: 110px 80px 110px 1fr 130px 80px;
   gap: 12px;
   align-items: center;
   padding: 10px 12px;
@@ -115,22 +129,23 @@ body {
 .chip {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(110, 182, 255, 0.15);
-  color: #6eb6ff;
+  background: rgba(19, 136, 8, 0.18);
+  color: #7ddf8f;
   font-weight: 600;
 }
 
 button {
-  background: #2b2f3a;
+  background: linear-gradient(135deg, #ff9933, #ffb366);
   border: none;
-  color: #f4f4f6;
+  color: #1a120b;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 button:hover {
-  background: #3a3f4d;
+  background: linear-gradient(135deg, #ffb366, #ffd199);
 }
 
 .form-panel form {

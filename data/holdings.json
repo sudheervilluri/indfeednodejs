@@ -1,14 +1,14 @@
 [
   {
-    "symbol": "AAPL",
-    "shares": 12,
-    "avgPrice": 182.45,
+    "symbol": "RELIANCE.NS",
+    "shares": 5,
+    "avgPrice": 2894.5,
     "addedAt": "2024-08-12T09:15:00Z"
   },
   {
-    "symbol": "MSFT",
-    "shares": 8,
-    "avgPrice": 392.1,
+    "symbol": "TCS.NS",
+    "shares": 3,
+    "avgPrice": 3925.1,
     "addedAt": "2024-08-11T11:20:00Z"
   }
 ]

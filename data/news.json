@@ -1,23 +1,23 @@
 [
   {
     "id": "news-1",
-    "source": "MarketWatch",
-    "title": "AI demand pushes cloud earnings outlook higher",
-    "symbol": "MSFT",
+    "source": "Moneycontrol",
+    "title": "Reliance shares climb on retail expansion update",
+    "symbol": "RELIANCE.NS",
     "publishedAt": "2024-08-12T10:00:00Z"
   },
   {
     "id": "news-2",
-    "source": "Bloomberg",
-    "title": "Apple unveils next-gen chips for on-device AI",
-    "symbol": "AAPL",
+    "source": "Economic Times",
+    "title": "TCS wins large transformation deal in Europe",
+    "symbol": "TCS.NS",
     "publishedAt": "2024-08-10T14:30:00Z"
   },
   {
     "id": "news-3",
-    "source": "Reuters",
-    "title": "Markets steady as investors parse inflation data",
-    "symbol": "SPY",
+    "source": "Business Standard",
+    "title": "Banking stocks rise as credit growth holds steady",
+    "symbol": "HDFCBANK.NS",
     "publishedAt": "2024-08-09T15:45:00Z"
   }
 ]
