@@ -1,0 +1,17 @@
+[
+  { "symbol": "RELIANCE.NS", "name": "Reliance Industries" },
+  { "symbol": "TCS.NS", "name": "Tata Consultancy Services" },
+  { "symbol": "INFY.NS", "name": "Infosys" },
+  { "symbol": "HDFCBANK.NS", "name": "HDFC Bank" },
+  { "symbol": "ICICIBANK.NS", "name": "ICICI Bank" },
+  { "symbol": "SBIN.NS", "name": "State Bank of India" },
+  { "symbol": "ITC.NS", "name": "ITC Limited" },
+  { "symbol": "HINDUNILVR.NS", "name": "Hindustan Unilever" },
+  { "symbol": "BHARTIARTL.NS", "name": "Bharti Airtel" },
+  { "symbol": "LT.NS", "name": "Larsen & Toubro" },
+  { "symbol": "ASIANPAINT.NS", "name": "Asian Paints" },
+  { "symbol": "ADANIENT.NS", "name": "Adani Enterprises" },
+  { "symbol": "MARUTI.NS", "name": "Maruti Suzuki" },
+  { "symbol": "AXISBANK.NS", "name": "Axis Bank" },
+  { "symbol": "KOTAKBANK.NS", "name": "Kotak Mahindra Bank" }
+]
